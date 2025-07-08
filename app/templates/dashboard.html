@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+{% block title %}Мои задачи{% endblock %}
+{% block content %}
+  <h2>Ваши задачи</h2>
+  <a href="{{ url_for('main.add') }}">➕ Добавить задачу</a>
+  <ul>
+    {% for task in tasks %}
+      <li>
+        {{ task.content }}
+        [<a href="{{ url_for('main.edit', id=task.id) }}">✏</a>]
+        [<a href="{{ url_for('main.delete', id=task.id) }}">❌</a>]
+      </li>
+    {% else %}
+      <li>Нет задач. Начните с новой → <a href="{{ url_for('main.add') }}">Добавить</a></li>
+    {% endfor %}
+  </ul>
+{% endblock %}

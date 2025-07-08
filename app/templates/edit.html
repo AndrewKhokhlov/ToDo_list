@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+{% block title %}Редактировать задачу{% endblock %}
+{% block content %}
+  <h2>Редактировать задачу</h2>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    {{ form.title.label }}<br>
+    {{ form.title(size=40) }}<br>
+
+    {{ form.content.label }}<br>
+    {{ form.content(rows=3) }}<br>
+
+    {{ form.submit(class="button") }}
+  </form>
+  <p><a href="{{ url_for('main.dashboard') }}">← Назад к списку</a></p>
+{% endblock %}

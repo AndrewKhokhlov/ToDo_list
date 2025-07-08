@@ -1,0 +1,83 @@
+{% extends "layout.html" %}
+{% block title %}Добавить задачу{% endblock %}
+
+{% block content %}
+  <h2>Новая задача</h2>
+<form method="POST">
+  {{ form.hidden_tag() }}
+
+  {{ form.title.label }}<br>
+  {{ form.title(size=40) }}<br>
+
+  {{ form.content.label }}<br>
+  {{ form.content(rows=3) }}<br>
+
+  {{ form.submit() }}
+</form>
+
+  <p><a href="{{ url_for('main.dashboard') }}">← Назад к списку задач</a></p>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    // Пример скрипта, который можно добавить
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Страница добавления задачи загружена');
+    });
+  </script>
+{% endblock %}
+
+{% block styles %}
+  <style>
+    /* Пример стилей, которые можно добавить */
+    .button {
+      background-color: #4CAF50; /* Зеленый цвет */
+      color: white; /* Белый текст */
+      padding: 10px 20px; /* Отступы */
+      border: none; /* Без рамки */
+      border-radius: 5px; /* Скругленные углы */
+      cursor: pointer; /* Указатель при наведении */
+    }
+  </style>
+{% endblock %}
+
+{% block footer %}
+  <footer>
+    <p>&copy; 2023 Todo App</p>
+  </footer>
+{% endblock %}
+
+{% block additional_content %}
+  <p>Дополнительная информация или ссылки могут быть добавлены здесь.</p>
+{% endblock %}
+
+{% block sidebar %}
+  <aside>
+    <h3>Боковая панель</h3>
+    <p>Здесь можно разместить дополнительные ссылки или информацию.</p>
+  </aside>
+{% endblock %}
+
+{% block navigation %}
+  <nav>
+    <ul>
+      <li><a href="{{ url_for('main.dashboard') }}">Главная</a></li>
+      <li><a href="{{ url_for('main.add_task') }}">Добавить задачу</a></li>
+      <li><a href="{{ url_for('main.view_tasks') }}">Просмотр задач</a></li>
+    </ul>
+  </nav>
+{% endblock %}
+
+{% block header %}
+  <header>
+    <h1>Todo App</h1>
+    <p>Управляйте своими задачами легко и просто!</p>
+  </header>
+{% endblock %}
+
+{% block main_content %}
+  <main>
+    <h2>Добро пожаловать в Todo App</h2>
+    <p>Здесь вы можете добавлять, просматривать и управлять своими задачами.</p>
+  </main>
+{% endblock %}

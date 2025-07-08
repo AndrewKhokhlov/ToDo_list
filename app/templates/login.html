@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+{% block title %}Вход{% endblock %}
+{% block content %}
+  <h2>Вход</h2>
+  <form method="POST">
+      {{ form.hidden_tag() }}
+      {{ form.username.label }} {{ form.username() }}<br>
+      {{ form.password.label }} {{ form.password() }}<br>
+      {{ form.submit() }}
+  </form>
+  <p>Нет аккаунта? <a href="{{ url_for('main.register') }}">Регистрация</a></p>
+{% endblock %}
