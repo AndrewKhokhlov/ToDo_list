@@ -1,5 +1,6 @@
-Flask
-Flask-SQLAlchemy
-Flask-Login
-Flask-WTF
-email-validator
+flask
+flask_sqlalchemy
+flask_login
+flask_wtf
+email_validator
+gunicorn
