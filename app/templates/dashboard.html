@@ -5,6 +5,11 @@
   <a href="{{ url_for('main.add') }}">➕ Добавить задачу</a>
   <ul>
     {% for task in tasks %}
+    <li>
+      <strong>{{ task.title }}</strong><br>
+      {{ task.content }}
+    </li>
+{% endfor %}
       <li>
         {{ task.content }}
         [<a href="{{ url_for('main.edit', id=task.id) }}">✏</a>]
