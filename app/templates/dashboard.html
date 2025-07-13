@@ -8,7 +8,8 @@
     <a href="{{ url_for('main.add') }}" class="btn btn-primary">➕ Добавить задачу</a>
   </div>
 
-  <!-- Гибкая обёртка для карточек -->
+  {% if tasks %}
+  <!-- Гибкий контейнер -->
   <div class="tasks-flex-wrapper">
     {% for task in tasks %}
       <div class="task-card">
@@ -17,20 +18,19 @@
             <h5 class="card-title">{{ task.title }}</h5>
             <p class="card-text">{{ task.content }}</p>
             <div class="mt-auto d-flex justify-content-between">
-              <a href="{{ url_for('main.edit', id=task.id) }}" class="btn btn-sm btn-outline-secondary">✏ Редактировать</a>
-              <a href="{{ url_for('main.delete', id=task.id) }}" class="btn btn-sm btn-outline-danger">❌ Удалить</a>
+              <a href="{{ url_for('main.edit', id=task.id) }}" class="btn btn-sm btn-outline-secondary">✏ Ред.</a>
+              <a href="{{ url_for('main.delete', id=task.id) }}" class="btn btn-sm btn-outline-danger">❌ Уд.</a>
             </div>
           </div>
         </div>
       </div>
-    {% else %}
-      <div class="w-100">
-        <div class="alert alert-info text-center mt-4">
-          У вас пока нет задач. 
-          <a href="{{ url_for('main.add') }}">Создать первую →</a>
-        </div>
-      </div>
     {% endfor %}
   </div>
+  {% else %}
+    <div class="alert alert-info text-center mt-4">
+      У вас пока нет задач. 
+      <a href="{{ url_for('main.add') }}">Создать первую →</a>
+    </div>
+  {% endif %}
 </div>
 {% endblock %}
