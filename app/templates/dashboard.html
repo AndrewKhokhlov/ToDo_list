@@ -27,22 +27,31 @@
             <h5 class="card-title">{{ task.title }}</h5>
             <p class="card-text">{{ task.content }}</p>
 
-            <!-- Кнопки: редактировать, удалить, переключить статус -->
-            <div class="mt-auto d-flex justify-content-between align-items-center gap-2">
-              <div class="btn-group" role="group">
-                <a href="{{ url_for('main.edit', id=task.id) }}" class="btn btn-sm btn-outline-secondary">✏</a>
-                <a href="{{ url_for('main.delete', id=task.id) }}" class="btn btn-sm btn-outline-danger">❌</a>
+            <div class="mt-auto d-flex flex-column gap-2">
+
+              <!-- Редактировать + Удалить — в один ряд -->
+              <div class="task-actions-row">
+                <form method="get" action="{{ url_for('main.edit', id=task.id) }}">
+                  <button type="submit" class="btn btn-sm btn-outline-secondary w-100">✏ Редактировать</button>
+                </form>
+                <form method="get" action="{{ url_for('main.delete', id=task.id) }}">
+                  <button type="submit" class="btn btn-sm btn-outline-danger w-100">❌ Удалить</button>
+                </form>
               </div>
 
-              <!-- Переключатель статуса -->
+              <!-- Переключатель статуса — на всю ширину -->
               <form method="post" action="{{ url_for('main.toggle_status', id=task.id) }}">
                 {% if task.completed %}
-                  <button type="submit" class="btn btn-sm btn-success">✅</button>
+                  <button type="submit" class="btn btn-sm btn-success w-100">✅ Завершено</button>
                 {% else %}
-                  <button type="submit" class="btn btn-sm btn-warning">⏳</button>
+                  <button type="submit" class="btn btn-sm btn-warning w-100">⏳ В процессе</button>
                 {% endif %}
               </form>
+
             </div>
+
+
+
 
           </div>
         </div>

@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}ToDoList{% endblock %}</title>
 
   <!-- 1) Bootstrap CSS (первым!) -->
   <link
@@ -30,7 +29,6 @@
     {% if current_user.is_authenticated %}
       <p>Привет, {{ current_user.username }} | <a href="{{ url_for('main.logout') }}">Выйти</a></p>
     {% endif %}
-    <h1 class="mb-4">ToDo List</h1>
 
     {% with messages = get_flashed_messages() %}
       {% if messages %}
