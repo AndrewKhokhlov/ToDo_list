@@ -62,20 +62,20 @@ def dashboard():
 @login_required
 def add():
     form = TaskForm()
-    
-    # Отладочный вывод в консоль
-    if request.method == 'POST':
-        print(">>>> POST /add, form data:", request.form)
-        print(">>>> validate_on_submit() =", form.validate_on_submit())
-        print(">>>> form.errors =", form.errors)
-    
     if form.validate_on_submit():
-        new_task = Task(content=form.content.data, user_id=current_user.id)
+        new_task = Task(
+            title=form.title.data,
+            content=form.content.data,
+            user_id=current_user.id
+        )
         db.session.add(new_task)
         db.session.commit()
         return redirect(url_for('main.dashboard'))
-    
+
+    # для GET (или если валидация не прошла) возвращаем шаблон с формой
     return render_template('add.html', form=form)
+
+
 
 
 @main.route('/edit/<int:id>', methods=['GET', 'POST'])

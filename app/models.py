@@ -9,6 +9,9 @@ class User(db.Model, UserMixin):
 
 class Task(db.Model):
     id       = db.Column(db.Integer, primary_key=True)
+    title    = db.Column(db.String(100), nullable=False)   # ← добавили!
     content  = db.Column(db.String(255), nullable=False)
     is_done  = db.Column(db.Boolean, default=False)
     user_id  = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    
