@@ -6,7 +6,7 @@ body {
     padding-top: 2rem;
 }
 
-/* своя обёртка для узких форм */
+/* контейнер для централизованных форм */
 .content-box {
     max-width: 600px;
     margin: auto;
@@ -24,9 +24,10 @@ body {
     justify-content: flex-start;
 }
 
-/* отдельная обёртка для карточки */
+/* каждая карточка фиксированной ширины */
 .task-card {
     width: 250px;
+    flex-shrink: 0;
 }
 
 /* карточки */
@@ -38,6 +39,7 @@ body {
     background-color: #fff;
     display: flex;
     flex-direction: column;
+    height: 100%;
 }
 
 .card:hover {
@@ -53,19 +55,35 @@ body {
 .card-text {
     color: #555;
     font-size: 0.95rem;
+    margin-bottom: 1rem;
 }
 
-/* чтобы кнопки внизу карточки всегда прижаты к низу */
+/* тело карточки с прилипанием кнопок вниз */
 .card-body {
     display: flex;
     flex-direction: column;
+    height: 100%;
 }
 
-/* скругления для кнопок */
+/* кнопки */
 .btn-outline-secondary,
 .btn-outline-danger,
-.btn-primary {
+.btn-primary,
+.btn-outline-primary,
+.btn-warning,
+.btn-success {
     border-radius: 6px;
+}
+
+/* выравнивание группы кнопок */
+.card .btn-group {
+    gap: 0.25rem;
+}
+
+/* фильтры */
+.btn-sm {
+    padding: 0.3rem 0.7rem;
+    font-size: 0.85rem;
 }
 
 /* сообщение об отсутствии задач */

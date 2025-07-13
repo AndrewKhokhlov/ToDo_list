@@ -3,13 +3,22 @@
 
 {% block content %}
 <div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
+
+  <!-- Заголовок и кнопка добавления -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="fw-bold">Ваши задачи</h2>
     <a href="{{ url_for('main.add') }}" class="btn btn-primary">➕ Добавить задачу</a>
   </div>
 
+  <!-- Фильтры -->
+  <div class="mb-4">
+    <a href="{{ url_for('main.dashboard') }}" class="btn btn-sm {% if not status %}btn-primary{% else %}btn-outline-primary{% endif %}">Все</a>
+    <a href="{{ url_for('main.dashboard', status='active') }}" class="btn btn-sm {% if status == 'active' %}btn-primary{% else %}btn-outline-primary{% endif %}">В процессе</a>
+    <a href="{{ url_for('main.dashboard', status='completed') }}" class="btn btn-sm {% if status == 'completed' %}btn-primary{% else %}btn-outline-primary{% endif %}">Выполнено</a>
+  </div>
+
   {% if tasks %}
-  <!-- Гибкий контейнер -->
+  <!-- Гибкая сетка задач -->
   <div class="tasks-flex-wrapper">
     {% for task in tasks %}
       <div class="task-card">
@@ -17,20 +26,36 @@
           <div class="card-body d-flex flex-column">
             <h5 class="card-title">{{ task.title }}</h5>
             <p class="card-text">{{ task.content }}</p>
-            <div class="mt-auto d-flex justify-content-between">
-              <a href="{{ url_for('main.edit', id=task.id) }}" class="btn btn-sm btn-outline-secondary">✏ Ред.</a>
-              <a href="{{ url_for('main.delete', id=task.id) }}" class="btn btn-sm btn-outline-danger">❌ Уд.</a>
+
+            <!-- Кнопки: редактировать, удалить, переключить статус -->
+            <div class="mt-auto d-flex justify-content-between align-items-center gap-2">
+              <div class="btn-group" role="group">
+                <a href="{{ url_for('main.edit', id=task.id) }}" class="btn btn-sm btn-outline-secondary">✏</a>
+                <a href="{{ url_for('main.delete', id=task.id) }}" class="btn btn-sm btn-outline-danger">❌</a>
+              </div>
+
+              <!-- Переключатель статуса -->
+              <form method="post" action="{{ url_for('main.toggle_status', id=task.id) }}">
+                {% if task.completed %}
+                  <button type="submit" class="btn btn-sm btn-success">✅</button>
+                {% else %}
+                  <button type="submit" class="btn btn-sm btn-warning">⏳</button>
+                {% endif %}
+              </form>
             </div>
+
           </div>
         </div>
       </div>
     {% endfor %}
   </div>
+
   {% else %}
     <div class="alert alert-info text-center mt-4">
       У вас пока нет задач. 
       <a href="{{ url_for('main.add') }}">Создать первую →</a>
     </div>
   {% endif %}
+
 </div>
 {% endblock %}

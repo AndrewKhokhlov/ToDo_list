@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, abort, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -55,8 +55,16 @@ def logout():
 @main.route('/dashboard')
 @login_required
 def dashboard():
-    tasks = Task.query.filter_by(user_id=current_user.id).all()
-    return render_template('dashboard.html', tasks=tasks)
+    status = request.args.get('status')  # "completed", "active", None
+    query = Task.query.filter_by(user_id=current_user.id)
+
+    if status == 'completed':
+        query = query.filter_by(completed=True)
+    elif status == 'active':
+        query = query.filter_by(completed=False)
+
+    tasks = query.order_by(Task.id.desc()).all()
+    return render_template('dashboard.html', tasks=tasks, status=status)
 
 @main.route('/add', methods=['GET', 'POST'])
 @login_required
@@ -72,11 +80,7 @@ def add():
         db.session.commit()
         return redirect(url_for('main.dashboard'))
 
-    # для GET (или если валидация не прошла) возвращаем шаблон с формой
     return render_template('add.html', form=form)
-
-
-
 
 @main.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -85,11 +89,13 @@ def edit(id):
     if task.user_id != current_user.id:
         return redirect(url_for('main.dashboard'))
 
-    form = TaskForm(content=task.content)
+    form = TaskForm(title=task.title, content=task.content)
     if form.validate_on_submit():
+        task.title = form.title.data
         task.content = form.content.data
         db.session.commit()
         return redirect(url_for('main.dashboard'))
+
     return render_template('edit.html', form=form)
 
 @main.route('/delete/<int:id>')
@@ -100,3 +106,17 @@ def delete(id):
         db.session.delete(task)
         db.session.commit()
     return redirect(url_for('main.dashboard'))
+
+@main.route('/toggle/<int:id>', methods=['POST'])
+@login_required
+def toggle_status(id):
+    task = Task.query.get_or_404(id)
+    if task.user_id != current_user.id:
+        abort(403)
+
+    task.completed = not task.completed
+    db.session.commit()
+
+    # сохраняем фильтр при возврате
+    status = request.args.get('status')
+    return redirect(url_for('main.dashboard', status=status) if status else url_for('main.dashboard'))
