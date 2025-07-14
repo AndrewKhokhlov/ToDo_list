@@ -6,10 +6,10 @@ from flask_login import LoginManager
 # создаём экземпляры расширений
 db = SQLAlchemy()
 login_manager = LoginManager()
-login_manager.login_view = 'main.login'  # если не залогинен — перенаправлять на логин
+login_manager.login_view = 'main.login'
 
 def create_app():
-    # app в режиме instance_relative_config, чтобы БД жилось в instance/
+
     app = Flask(__name__, instance_relative_config=True)
 
     # базовая конфигурация
@@ -19,7 +19,7 @@ def create_app():
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
     )
 
-    # создаём папку instance/, если её нет
+    # создаём папку instance/
     os.makedirs(app.instance_path, exist_ok=True)
 
     # инициализируем расширения
