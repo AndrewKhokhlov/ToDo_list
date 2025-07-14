@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h2> Задачи пользователя: {{ user.username }}</h2>
+
+<h3>📋 В процессе</h3>
+<ul>
+  {% for task in todo_tasks %}
+    <li><strong>{{ task.title }}</strong><br>{{ task.content }}</li>
+  {% else %}
+    <li>Нет задач</li>
+  {% endfor %}
+</ul>
+
+<h3>✅ Выполнено</h3>
+<ul>
+  {% for task in done_tasks %}
+    <li><strong>{{ task.title }}</strong><br>{{ task.content }}</li>
+  {% else %}
+    <li>Нет задач</li>
+  {% endfor %}
+</ul>
+
+<a href="{{ url_for('main.admin_panel') }}">← Назад к списку пользователей</a>
+{% endblock %}

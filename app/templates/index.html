@@ -1,19 +1,15 @@
-{% extends 'layout.html' %}
-{% block title %}Добавить задачу{% endblock %}
+{% extends "layout.html" %}
+{% block title %}Добро пожаловать{% endblock %}
+
 {% block content %}
-  <h2>Новая задача</h2>
-  <form method="POST">
-    {{ form.hidden_tag() }}
-    {{ form.content.label }}<br>
-    {{ form.content(rows=3) }}<br>
-    {{ form.submit() }}
-  </form>
-{% endblock %}
-{% block scripts %}
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const contentField = document.querySelector('textarea[name="content"]');
-      contentField.focus();
-    });
-  </script>
+<div class="hero-section d-flex flex-column justify-content-center align-items-center text-center">
+  <h1 class="display-4 fw-bold mb-3">Добро пожаловать в ToDoList 📝</h1>
+  <p class="lead text-muted mb-4">
+    Управляйте своими задачами легко и быстро. Входите или регистрируйтесь, чтобы начать!
+  </p>
+  <div>
+    <a href="{{ url_for('main.login') }}" class="btn btn-primary btn-lg me-2">🔐 Войти</a>
+    <a href="{{ url_for('main.register') }}" class="btn btn-outline-primary btn-lg">📝 Регистрация</a>
+  </div>
+</div>
 {% endblock %}

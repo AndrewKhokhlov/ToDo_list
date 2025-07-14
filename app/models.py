@@ -6,10 +6,11 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(64), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
     tasks = db.relationship('Task', backref='user', lazy=True)
+    is_admin = db.Column(db.Boolean, default=False)
 
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120), nullable=False)
     content = db.Column(db.Text)
-    completed = db.Column(db.Boolean, default=False)  # ← добавь это
+    completed = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

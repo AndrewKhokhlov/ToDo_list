@@ -1,6 +1,15 @@
-from flask import Blueprint, abort, render_template, redirect, url_for, flash, request
-from flask_login import login_user, logout_user, login_required, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
+# app/routes.py
+from flask import (
+    Blueprint, abort, render_template, redirect,
+    url_for, flash, request
+)
+from flask_login import (
+    login_user, logout_user,
+    login_required, current_user
+)
+from werkzeug.security import (
+    generate_password_hash, check_password_hash
+)
 
 from app import db, login_manager
 from app.models import User, Task
@@ -8,25 +17,71 @@ from app.forms import RegisterForm, LoginForm, TaskForm
 
 main = Blueprint('main', __name__)
 
+# ────────────────────────────────────────────────────────────────────────────────
+#  Flask‑Login: загрузка пользователя
+# ────────────────────────────────────────────────────────────────────────────────
 @login_manager.user_loader
-def load_user(user_id):
+def load_user(user_id: str):
     return User.query.get(int(user_id))
 
+# ────────────────────────────────────────────────────────────────────────────────
+#  ⛩  Админ‑панель
+# ────────────────────────────────────────────────────────────────────────────────
+@main.route('/admin')
+@login_required
+def admin_panel():
+    """Список всех пользователей (видит только админ)."""
+    if not current_user.is_admin:
+        abort(403)
+
+    users = User.query.order_by(User.id).all()
+    return render_template('admin.html', users=users)
+
+
+@main.route('/user/<int:user_id>/tasks')
+@login_required
+def user_tasks(user_id: int):
+    """Все задачи конкретного пользователя (доступно только админу)."""
+    if not current_user.is_admin:
+        abort(403)
+
+    user = User.query.get_or_404(user_id)
+    done_tasks = Task.query.filter_by(
+        user_id=user_id, completed=True
+    ).all()
+    todo_tasks = Task.query.filter_by(
+        user_id=user_id, completed=False
+    ).all()
+
+    return render_template(
+        'user_tasks.html',
+        user=user,
+        done_tasks=done_tasks,
+        todo_tasks=todo_tasks
+    )
+
+# ────────────────────────────────────────────────────────────────────────────────
+#  🌐  Публичные страницы
+# ────────────────────────────────────────────────────────────────────────────────
 @main.route('/')
 def home():
     return redirect(url_for('main.login'))
 
+# ────────────────────────────────────────────────────────────────────────────────
+#  🔐  Регистрация / Логин / Логаут
+# ────────────────────────────────────────────────────────────────────────────────
 @main.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        existing_user = User.query.filter_by(username=form.username.data).first()
-        if existing_user:
+        if User.query.filter_by(username=form.username.data).first():
             flash("Пользователь уже существует")
             return redirect(url_for('main.register'))
 
-        hashed_pw = generate_password_hash(form.password.data)
-        new_user = User(username=form.username.data, password=hashed_pw)
+        new_user = User(
+            username=form.username.data,
+            password=generate_password_hash(form.password.data)
+        )
         db.session.add(new_user)
         db.session.commit()
         flash("Регистрация успешна!")
@@ -34,17 +89,25 @@ def register():
 
     return render_template('register.html', form=form)
 
+
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
+
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
+
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-            return redirect(url_for('main.dashboard'))
-        else:
-            flash("Неверный логин или пароль")
+
+            # Админ → /admin, обычный юзер → /dashboard
+            dest = 'main.admin_panel' if user.is_admin else 'main.dashboard'
+            return redirect(url_for(dest))
+
+        flash("Неверный логин или пароль")
+
     return render_template('login.html', form=form)
+
 
 @main.route('/logout')
 @login_required
@@ -52,6 +115,9 @@ def logout():
     logout_user()
     return redirect(url_for('main.login'))
 
+# ────────────────────────────────────────────────────────────────────────────────
+#  📋  Задачи текущего пользователя
+# ────────────────────────────────────────────────────────────────────────────────
 @main.route('/dashboard')
 @login_required
 def dashboard():
@@ -64,7 +130,11 @@ def dashboard():
         query = query.filter_by(completed=False)
 
     tasks = query.order_by(Task.id.desc()).all()
-    return render_template('dashboard.html', tasks=tasks, status=status)
+    return render_template(
+        'dashboard.html',
+        tasks=tasks,
+        status=status
+    )
 
 @main.route('/add', methods=['GET', 'POST'])
 @login_required
@@ -84,7 +154,7 @@ def add():
 
 @main.route('/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
-def edit(id):
+def edit(id: int):
     task = Task.query.get_or_404(id)
     if task.user_id != current_user.id:
         return redirect(url_for('main.dashboard'))
@@ -100,7 +170,7 @@ def edit(id):
 
 @main.route('/delete/<int:id>')
 @login_required
-def delete(id):
+def delete(id: int):
     task = Task.query.get_or_404(id)
     if task.user_id == current_user.id:
         db.session.delete(task)
@@ -109,7 +179,7 @@ def delete(id):
 
 @main.route('/toggle/<int:id>', methods=['POST'])
 @login_required
-def toggle_status(id):
+def toggle_status(id: int):
     task = Task.query.get_or_404(id)
     if task.user_id != current_user.id:
         abort(403)
@@ -117,6 +187,8 @@ def toggle_status(id):
     task.completed = not task.completed
     db.session.commit()
 
-    # сохраняем фильтр при возврате
-    status = request.args.get('status')
-    return redirect(url_for('main.dashboard', status=status) if status else url_for('main.dashboard'))
+    status = request.args.get('status')  # сохраняем фильтр при возврате
+    return redirect(
+        url_for('main.dashboard', status=status)
+        if status else url_for('main.dashboard')
+    )
