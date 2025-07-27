@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Настройки профиля</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Настройки профиля</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+            {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
+    <h2>Редактирование данных</h2>
+    <form method="POST" action="{{ url_for('main.settings') }}">
+        {{ form.hidden_tag() }}
+        <div>
+            {{ form.username.label }}<br>
+            {{ form.username(size=32) }}<br>
+            {% for error in form.username.errors %}
+                <span>{{ error }}</span><br>
+            {% endfor %}
+        </div>
+        <div>
+            {{ form.email.label }}<br>
+            {{ form.email(size=32) }}<br>
+            {% for error in form.email.errors %}
+                <span>{{ error }}</span><br>
+            {% endfor %}
+        </div>
+        <div>
+            {{ form.submit() }}
+        </div>
+    </form>
+
+    <h2>Изменить пароль</h2>
+    <p><a href="{{ url_for('main.change_password') }}">Изменить пароль</a></p>
+
+    <h2>Удалить аккаунт</h2>
+    <form method="POST" action="{{ url_for('main.delete_account') }}" onsubmit="return confirm('Вы уверены, что хотите удалить свой аккаунт? Это действие необратимо.');">
+        <button type="submit" class="btn-danger">Удалить аккаунт</button>
+    </form>
+
+    <p><a href="{{ url_for('main.home') }}">Вернуться на главную</a></p>
+</body>
+</html>

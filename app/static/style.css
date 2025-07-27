@@ -1,210 +1,412 @@
-/* 🔷 Основной стиль страницы — фон, шрифт, цвет текста */
+/*
+ * 🌟 ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ CSS
+ * Определяют основную цветовую палитру, размеры отступов, радиусы скругления и тени.
+ * Эти переменные используются по всему проекту для обеспечения консистентности.
+ */
+:root {
+    --primary-color: #007bff; /* Основной синий для кнопок, ссылок */
+    --primary-dark-color: #0056b3; /* Темнее для hover */
+    --accent-color: #0014ac; /* Ваш существующий акцентный синий */
+    --accent-dark-color: #3d4dcc; /* Ваш существующий акцентный синий для hover */
+    --text-dark: #333; /* Темный текст */
+    --text-medium: #555; /* Средний серый текст */
+    --text-light: #888; /* Светлый серый текст для подсказок */
+    --bg-light: #f6f8fa; /* Светлый фон страницы */
+    --bg-white: #fff; /* Белый фон для блоков */
+    --shadow-light: rgba(0,0,0,0.06);
+    --shadow-medium: rgba(0,0,0,0.1);
+    --border-light: #e0e0e0; /* Светлая граница */
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #17a2b8;
+
+    --border-radius-sm: 6px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 16px;
+
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+}
+
+/*
+ * 🌐 ОБЩИЕ СТИЛИ СТРАНИЦЫ И ТИПОГРАФИКА
+ * Применяются ко всем страницам через layout.html.
+ */
 body {
-    font-family: Arial, sans-serif;               /* Простой, читаемый шрифт */
-    background-color: #f6f8fa;                    /* Светло-серый фон */
-    color: #333;                                   /* Тёмно-серый цвет текста */
-    padding-top: 0rem;                             /* Отступ сверху (можно оставить 0) */
+    font-family: 'Inter', 'Segoe UI', 'Roboto', Arial, sans-serif; /* Современный шрифт, с запасными */
+    background-color: var(--bg-light); /* Светло-серый фон */
+    color: var(--text-dark); /* Тёмно-серый цвет текста */
+    line-height: 1.6; /* Улучшение читабельности текста */
+    margin: 0;
+    padding: 0;
 }
 
-/* 🔷 Контейнер для центрального блока (например, формы входа или регистрации) */
-.content-box {
-    max-width: 600px;                              /* Ограничение по ширине */
-    margin: auto;                                  /* Центровка по горизонтали */
-    background: #fff;                              /* Белый фон */
-    padding: 1.5rem;                               /* Внутренние отступы */
-    border-radius: 8px;                            /* Скруглённые углы */
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);          /* Тень вокруг блока */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-dark);
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
 }
 
-/* 🔷 Контейнер для всех карточек задач — включает флекс-сетку */
-.tasks-flex-wrapper {
-    display: flex;                                 /* Включаем флекс-контейнер */
-    flex-wrap: wrap;                               /* Разрешаем перенос строк */
-    gap: 1.5rem;                                   /* Расстояние между карточками */
-    justify-content: flex-start;                  /* Выравнивание влево */
+/*
+ * 📄 СТИЛИ ФОРМ (ОБЩИЕ для login.html, register.html, settings.html)
+ * Применяются к элементам форм, таким как поля ввода и группы ввода.
+ */
+.form-label {
+    font-weight: 600; /* Метка поля чуть жирнее */
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-medium);
 }
 
-/* 🔷 Отдельная карточка задачи — фиксированная ширина */
-.task-card {
-    width: 300px;                                  /* Фиксированная ширина карточки */
-    flex-shrink: 0;                                /* Не сжимается при переполнении */
+.form-control {
+    border-radius: var(--border-radius-sm);
+    border: 1px solid var(--border-light);
+    padding: 0.6rem 0.8rem; /* Уменьшен padding для полей ввода */
+    font-size: 0.95rem; /* Уменьшен шрифт для полей */
+    color: var(--text-dark);
 }
 
-/* 🔷 Общий стиль карточек */
-.card {
-    border: none;                                  /* Без рамки */
-    border-radius: 12px;                           /* Скругление углов */
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06);       /* Лёгкая тень */
-    transition: transform 0.20s ease, box-shadow 0.20s ease;  /* Анимация при наведении */
-    background-color: #fff;                        /* Белый фон */
-    display: flex;                                 /* Вертикальное выравнивание */
-    flex-direction: column;
-    height: 100%;                                  /* Карточка тянется на всю высоту */
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25); /* Bootstrap-подобный focus ring */
+    outline: none; /* Убираем стандартный outline браузера */
 }
 
-/* 🔷 Анимация при наведении */
-.card:hover {
-    transform: translateY(-4px);                   /* Поднимаем карточку вверх */
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);        /* Увеличиваем тень */
+/* 🟢 ИСПРАВЛЕНИЕ ДЛЯ INPUT-GROUP (для "глазика" в полях пароля) */
+.input-group .form-control {
+    /* ИСПРАВЛЕНО: border-right: 0; чтобы сливалась с кнопкой, а не 1 */
+    border-right: 0;
+    /* Убедимся, что скругление только слева, если кнопка справа */
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
-/* 🔷 Заголовок задачи */
-.card-title {
-    font-size: 1.2rem;
-    font-weight: 600;
+.input-group .btn {
+    border-left: 1px solid var(--border-light); /* Добавляем левую границу для кнопки */
+    /* Убедимся, что скругление только справа */
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-radius: var(--border-radius-sm); /* Для правой стороны кнопки */
+    padding: 0.6rem; /* Симметричный padding для кнопки, чтобы высота совпадала */
+    font-size: 0.95rem; /* Размер иконки */
+    background-color: var(--bg-white);
+    color: var(--text-light);
+    display: flex; /* Важно для центрирования иконки */
+    align-items: center; /* Центрируем по вертикали */
+    justify-content: center; /* Центрируем по горизонтали */
+    /* Удалена сложная calc() высота, так как padding должен выравнивать их */
+    /* Если все еще есть проблемы с высотой, можно добавить: height: 100%; */
 }
 
-/* 🔷 Текст описания задачи */
-.card-text {
-    color: #555;                                   /* Серый текст */
+.input-group .btn:hover {
+    color: var(--text-medium);
+    background-color: var(--bg-light);
+}
+
+/*
+ * � СТИЛИ СООБЩЕНИЙ ОБ ОШИБКАХ (для всех форм, включая login.html, register.html)
+ * Применяются к сообщениям валидации под полями форм.
+ */
+.text-danger {
+    color: var(--danger-color) !important; /* Убедимся, что цвет ошибки красный */
+    font-size: 0.875rem; /* Чуть меньше размер для ошибок */
+    margin-top: var(--spacing-xs);
+}
+
+/*
+ * 🔔 СТИЛИ ФЛЭШ-СООБЩЕНИЙ (общие уведомления)
+ * Используются для сообщений Flask, таких как "Регистрация успешна!", "Неверный Email или пароль".
+ * Отображаются через layout.html.
+ */
+.flashes {
+    list-style: none; /* Убрать маркеры списка */
+    padding: 0;
+    margin-bottom: var(--spacing-md);
+}
+
+.flashes li {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--border-radius-sm);
+    margin-bottom: var(--spacing-sm);
     font-size: 0.95rem;
-    margin-bottom: 1rem;
+    border: 1px solid transparent;
 }
 
-/* 🔷 Контейнер внутри карточки (чтобы кнопки прижимались вниз) */
-.card-body {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+/* Используем явные цвета вместо lighten/darken для совместимости с чистым CSS */
+.flashes li.success {
+    background-color: #d4edda; /* Light green */
+    color: #155724; /* Dark green */
+    border-color: #c3e6cb; /* Medium green */
 }
 
-/* 🔷 Стили для разных типов кнопок */
-.btn-outline-secondary,
-.btn-outline-danger,
-.btn-primary,
-.btn-outline-primary,
-.btn-warning,
-.btn-success {
-    border-radius: 6px;                            /* Скруглённые углы */
+.flashes li.danger {
+    background-color: #f8d7da; /* Light red */
+    color: #721c24; /* Dark red */
+    border-color: #f5c6cb; /* Medium red */
 }
 
-/* 🔷 Группа кнопок (если используешь Bootstrap btn-group) */
-.card .btn-group {
-    gap: 0.25rem;                                  /* Расстояние между кнопками */
+.flashes li.info {
+    background-color: #d1ecf1; /* Light blue */
+    color: #0c5460; /* Dark blue */
+    border-color: #bee5eb; /* Medium blue */
 }
 
-/* 🔷 Маленькие кнопки (например, фильтры) */
-.btn-sm {
-    padding: 0.3rem 0.7rem;
-    font-size: 0.85rem;
-}
-
-/* 🔷 Блок с сообщением "Задач нет" */
-.alert-info {
-    border-radius: 8px;
-    background-color: #e9f5ff;                     /* Светло-синий фон */
-    color: #0d6efd;                                /* Синий текст */
-}
-
-/* 🔷 Фон для страницы входа — градиент */
-.login-page {
-    min-height: 100vh;
-    background: linear-gradient(to bottom right, #fdfbfb, #ebedee); 
-    display: flex;
+/*
+ * 🎨 ОБЩИЕ СТИЛИ КНОПОК
+ * Применяются ко всем кнопкам, используются на всех страницах.
+ */
+.btn {
+    border-radius: var(--border-radius-sm);
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 2rem;
-    font-family: 'Segoe UI', 'Roboto', sans-serif;
+    gap: var(--spacing-xs);
 }
 
-/* 🔷 Центровка блока логина */
-.login-container {
-    max-width: 420px;
-    width: 100%;
+.btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
 }
 
-/* 🔷 Заголовок ToDo-приложения */
-.app-title {
-    font-size: 2.2rem;
-    font-weight: bold;
-    color: #333;
-    font-family: 'Segoe UI Semibold', sans-serif;
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--bg-white);
 }
 
-/* 🔷 Блок формы авторизации/регистрации */
-.auth-box {
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05);    /* Глубокая тень */
-    animation: fadeInUp 0.5s ease-out;
-    border: 1px solid #e0e0e0;
+.btn-primary:hover {
+    background-color: var(--primary-dark-color);
+    border-color: var(--primary-dark-color);
 }
 
-/* 🔷 Красный цвет акцента (например, ошибки) */
-.text-accent {
-    color: #ce0000;
+.btn-outline-primary {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    background-color: transparent;
 }
 
-/* 🔷 Кнопка с фирменным синим акцентом */
-.btn-accent {
-    background-color: #0014ac;
-    color: white;
-    border: none;
-    transition: background-color 0.3s ease;
+.btn-outline-primary:hover {
+    background-color: var(--primary-color);
+    color: var(--bg-white);
 }
 
-.btn-accent:hover {
-    background-color: #3d4dcc;
+.btn-warning {
+    background-color: var(--warning-color);
+    border-color: var(--warning-color);
+    color: var(--text-dark);
+}
+.btn-warning:hover { background-color: #e0a800; } /* Ручной расчет */
+
+.btn-success {
+    background-color: var(--success-color);
+    border-color: var(--success-color);
+    color: var(--bg-white);
+}
+.btn-success:hover { background-color: #218838; } /* Ручной расчет */
+
+.btn-danger {
+    background-color: var(--danger-color);
+    border-color: var(--danger-color);
+    color: var(--bg-white);
+}
+.btn-danger:hover { background-color: #c82333; } /* Ручной расчет */
+
+.btn-outline-secondary { /* Для редактирования/удаления в карточках задач */
+    color: var(--text-medium);
+    border-color: var(--border-light);
+    background-color: transparent;
 }
 
-/* 🔷 Ссылки с акцентом */
-.link-accent {
-    color: #5468ff;
-    text-decoration: none;
+.btn-outline-secondary:hover {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
 }
 
-.link-accent:hover {
-    text-decoration: underline;
+.btn-sm {
+    padding: 0.35rem 0.8rem;
+    font-size: 0.9rem;
+    border-radius: var(--border-radius-sm);
 }
 
-/* 🔷 Анимация появления блока */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* 🔷 Убираем отступы у форм внутри группы кнопок */
+/* Убираем отступы у форм внутри группы кнопок (например, в карточках задач) */
 .btn-group form {
     margin: 0;
 }
 
-/* 🔷 Размер кнопок в карточке */
-.card .btn {
-    padding: 0.3rem 0.6rem;
-    font-size: 0.8rem;
-}
 
-/* 🔷 Горизонтальное расположение кнопок редактирования и удаления */
-.task-actions-row {
+/*
+ * 🔑 СТИЛИ СТРАНИЦ АВТОРИЗАЦИИ (login.html, register.html, forgot_password.html, reset_password.html)
+ * Определяют общий макет и внешний вид блоков для входа/регистрации.
+ */
+.login-page { /* Используется для создания центрированного фона на весь экран */
+    min-height: 100vh;
+    background: linear-gradient(to bottom right, #e0f2f7, #c6e6e9);
     display: flex;
-    justify-content: space-between;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+    font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
 }
 
-/* 🔷 Каждая кнопка (в виде формы) занимает 50% ширины */
-.task-actions-row form {
-    flex: 1;
-}
-
-/* 🔷 Кнопка переключения статуса — занимает 100% ширины */
-.card-body form:last-child .btn {
+.login-container { /* Ограничивает ширину всей формы авторизации */
+    max-width: 380px; /* Уменьшенная максимальная ширина */
     width: 100%;
 }
 
-.input-group .form-control {
-  border-right: none;
+.app-title { /* Заголовок "📝 ToDo List" */
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--accent-color);
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    margin-bottom: var(--spacing-lg) !important;
 }
 
-.input-group .btn {
-  border-left: none;
-  border-radius: 0 0.5rem 0.5rem 0;
-  padding: 0 0.75rem;
-  font-size: 0.9rem;
+.auth-box { /* Основной контейнер для формы входа/регистрации */
+    background: var(--bg-white);
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08);
+    animation: fadeInUp 0.6s ease-out;
+    border: 1px solid var(--border-light);
+    padding: var(--spacing-lg);
+}
+
+.text-accent { /* Цвет для заголовков "Добро пожаловать" */
+    color: var(--accent-color);
+}
+
+.btn-accent { /* Основная кнопка входа/регистрации */
+    background-color: var(--accent-color);
+    color: var(--bg-white);
+    border: none;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.95rem;
+}
+
+.btn-accent:hover {
+    background-color: var(--accent-dark-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.link-accent { /* Ссылки "Регистрация" / "Забыли пароль?" */
+    color: var(--accent-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.link-accent:hover {
+    text-decoration: underline;
+    color: var(--accent-dark-color);
+}
+
+/* Анимация появления блока форм */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/*
+ * ✅ СТИЛИ ЗАДАЧ (для dashboard.html, add.html, edit.html)
+ * Определяют внешний вид карточек задач, кнопок внутри них и фильтров.
+ */
+.content-box { /* Общий контейнер для страниц, таких как settings.html */
+    max-width: 600px;
+    margin: var(--spacing-xl) auto;
+    background: var(--bg-white);
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 0 10px var(--shadow-medium);
+    border: 1px solid var(--border-light);
+}
+
+.tasks-flex-wrapper { /* Контейнер для всех карточек задач */
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-lg);
+    justify-content: flex-start;
+    padding-bottom: var(--spacing-xl);
+}
+
+.task-card { /* Отдельная карточка задачи */
+    flex: 1 0 300px;
+    max-width: calc(33.333% - var(--spacing-lg) * 2 / 3); /* Для 3 колонок с gap */
+}
+
+/* Адаптивность task-card для меньших экранов */
+@media (max-width: 992px) { /* Tablet */
+    .task-card { max-width: calc(50% - var(--spacing-lg) / 2); } /* 2 колонки */
+}
+@media (max-width: 768px) { /* Mobile */
+    .task-card { max-width: 100%; } /* 1 колонка */
+    .tasks-flex-wrapper { justify-content: center; } /* Центрируем карточки на мобильных */
+}
+
+.card { /* Общий стиль карточек */
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius-lg);
+    box-shadow: 0 2px 10px var(--shadow-light);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    background-color: var(--bg-white);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.card:hover { /* Анимация при наведении */
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px var(--shadow-medium);
+}
+
+.card-title { /* Заголовок задачи */
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: var(--spacing-sm);
+}
+
+.card-text { /* Текст описания задачи */
+    color: var(--text-medium);
+    font-size: 1rem;
+    margin-bottom: var(--spacing-md);
+}
+
+.card-body { /* Контейнер внутри карточки */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: var(--spacing-md);
+}
+
+.task-actions-row { /* Горизонтальное расположение кнопок редактирования и удаления */
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+}
+.task-actions-row form { flex: 1; } /* Каждая кнопка занимает 50% ширины */
+
+/* Кнопка переключения статуса — занимает 100% ширины.
+   Добавьте класс 'task-status-btn' к форме или кнопке в HTML, если это нужно. */
+/* .task-status-btn .btn { width: 100%; } */
+
+.alert-info { /* Блок с сообщением "Задач нет" */
+    border-radius: var(--border-radius-md);
+    background-color: #d1ecf1;
+    color: #0c5460;
+    padding: var(--spacing-md);
+    text-align: center;
+    border: 1px solid var(--info-color);
 }

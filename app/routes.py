@@ -12,7 +12,8 @@ from werkzeug.security import (
 
 from app import db, login_manager
 from app.models import User, Task
-from app.forms import RegisterForm, LoginForm, TaskForm
+from app.forms import RegisterForm, LoginForm, EditProfileForm, ChangePasswordForm, TaskForm
+
 
 main = Blueprint('main', __name__)
 
@@ -56,7 +57,7 @@ def user_tasks(user_id: int):
         todo_tasks=todo_tasks
     )
 
-'''# Временный роут для первого создания админа.
+# Временный роут для первого создания админа.
 @main.route('/create-admin')
 def create_admin():
     """Однократное создание суперпользователя."""
@@ -65,12 +66,13 @@ def create_admin():
 
     admin = User(
         username='Tengakuro',
+        email='tengakuro@example.com',
         password=generate_password_hash('Gendalf999'),
         is_admin=True
     )
     db.session.add(admin)
     db.session.commit()
-    return 'Admin created!'''
+    return 'Admin created!'
 
 #  Публичные страницы
 @main.route('/')
@@ -85,36 +87,47 @@ def home():
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
+    
     form = RegisterForm()
     if form.validate_on_submit():
-        if User.query.filter_by(username=form.username.data).first():
-            flash("Пользователь уже существует")
-            return redirect(url_for('main.register'))
+        # Валидаторы form.validate_username и form.validate_email уже проверили уникальность
+        # Если бы они не прошли, form.validate_on_submit() был бы False,
+        # и этот блок не был бы выполнен.
 
         new_user = User(
             username=form.username.data,
+            email=form.email.data,
             password=generate_password_hash(form.password.data)
         )
         db.session.add(new_user)
         db.session.commit()
-        flash("Регистрация успешна!")
+        flash("Регистрация успешна!", 'success') # Добавил категорию 'success'
         return redirect(url_for('main.login'))
 
+    # Если это GET-запрос ИЛИ валидация не прошла, рендерим форму.
+    # Ошибки валидации будут автоматически привязаны к полям формы (form.username.errors, form.email.errors и т.д.)
     return render_template('register.html', form=form)
 
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.home')) # Или 'main.dashboard'
+    
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        # ИЗМЕНЕНО: Ищем пользователя по email, а не по username
+        user = User.query.filter_by(email=form.email.data).first()
+        
+        # Проверяем, найден ли пользователь и совпадает ли пароль
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-            return redirect(url_for('main.home'))
-        flash("Неверный логин или пароль")
-
+            flash("Вы успешно вошли в систему!", 'success') # Опциональное флэш-сообщение
+            return redirect(url_for('main.home')) # Или 'main.dashboard'
+        
+        # Если пользователь не найден или пароль не совпал
+        flash("Неверный Email или пароль", 'danger')
+    
     return render_template('login.html', form=form)
 
 
@@ -259,3 +272,50 @@ def delete_user(user_id):
     db.session.commit()
     flash(f"Пользователь {user.username} и все его задачи были удалены.", "success")
     return redirect(url_for('main.admin_panel'))
+
+
+@main.route('/settings', methods=['GET', 'POST'])
+@login_required # Только авторизованные пользователи могут получить доступ
+def settings():
+    form = EditProfileForm(current_user.username, current_user.email) # Передаем текущие данные для валидации
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        db.session.commit()
+        flash('Ваши настройки профиля были сохранены.', 'success')
+        return redirect(url_for('main.settings'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+    return render_template('settings.html', form=form)
+
+@main.route('/change_password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        if not check_password_hash(current_user.password, form.current_password.data):
+            flash('Неверный текущий пароль.', 'danger')
+        else:
+            current_user.password = generate_password_hash(form.new_password.data)
+            db.session.commit()
+            flash('Ваш пароль успешно изменен.', 'success')
+            return redirect(url_for('main.settings')) # Перенаправляем обратно на страницу настроек
+    return render_template('change_password.html', form=form)
+
+@main.route('/delete_account', methods=['POST'])
+@login_required
+def delete_account():
+    # 1. Сохраняем ссылку на реальный объект пользователя
+    # current_user здесь все еще ссылается на объект User из БД
+    user_to_delete = current_user
+    
+    # 2. Удаляем пользователя из сессии SQLAlchemy
+    db.session.delete(user_to_delete)
+    db.session.commit() # Зафиксировать удаление в базе данных
+
+    # 3. После успешного удаления из БД, выходим из системы
+    logout_user() 
+    
+    flash('Ваш аккаунт был успешно удален.', 'info')
+    return redirect(url_for('main.register')) # Или куда-либо еще после удаления

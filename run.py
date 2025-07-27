@@ -1,13 +1,60 @@
+import sys
 import os
+
+'''print("--- sys.path ---")
+for p in sys.path:
+    print(p)
+print("--- Current Working Directory ---")
+print(os.getcwd())
+print("----------------")'''
+
 from app import create_app, db
 from app.models import User
 from werkzeug.security import generate_password_hash
+#from flask_mail import Mail
 
 app = create_app()
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(debug=True, host='0.0.0.0', port=port)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 '''# Добавьте эту команду
 @app.cli.command("create-admin")

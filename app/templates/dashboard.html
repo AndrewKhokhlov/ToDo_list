@@ -4,13 +4,14 @@
 {% block content %}
 <div class="container mt-4">
 
-  <!-- Заголовок и кнопка добавления -->
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="fw-bold">Ваши задачи</h2>
-    <a href="{{ url_for('main.add') }}" class="btn btn-primary">➕ Добавить задачу</a>
+    <div>
+      <a href="{{ url_for('main.add') }}" class="btn btn-primary me-2">➕ Добавить задачу</a>
+      <a href="{{ url_for('main.settings') }}" class="btn btn-info">⚙️ Настройки</a> {# <-- ДОБАВЛЕНО ЗДЕСЬ #}
+    </div>
   </div>
 
-  <!-- Фильтры -->
   <div class="mb-4">
     <a href="{{ url_for('main.dashboard') }}" class="btn btn-sm {% if not status %}btn-primary{% else %}btn-outline-primary{% endif %}">Все</a>
     <a href="{{ url_for('main.dashboard', status='active') }}" class="btn btn-sm {% if status == 'active' %}btn-primary{% else %}btn-outline-primary{% endif %}">В процессе</a>
@@ -18,7 +19,6 @@
   </div>
 
   {% if tasks %}
-  <!-- Гибкая сетка задач -->
   <div class="tasks-flex-wrapper">
     {% for task in tasks %}
       <div class="task-card">
@@ -29,7 +29,6 @@
 
             <div class="mt-auto d-flex flex-column gap-2">
 
-              <!-- Редактировать + Удалить — в один ряд -->
               <div class="task-actions-row">
                 <form method="get" action="{{ url_for('main.edit', id=task.id) }}">
                   <button type="submit" class="btn btn-sm btn-outline-secondary w-100">✏ Редактировать</button>
@@ -39,7 +38,6 @@
                 </form>
               </div>
 
-              <!-- Переключатель статуса — на всю ширину -->
               <form method="post" action="{{ url_for('main.toggle_status', id=task.id) }}">
                 {% if task.completed %}
                   <button type="submit" class="btn btn-sm btn-success w-100">✅ Завершено</button>
