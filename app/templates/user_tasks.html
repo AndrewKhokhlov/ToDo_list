@@ -1,25 +1,73 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h2> Задачи пользователя: {{ user.username }}</h2>
+<h2>🧾 Задачи пользователя: {{ user.username }}</h2>
 
-<h3>📋 В процессе</h3>
-<ul>
-  {% for task in todo_tasks %}
-    <li><strong>{{ task.title }}</strong><br>{{ task.content }}</li>
-  {% else %}
-    <li>Нет задач</li>
-  {% endfor %}
-</ul>
+<a href="{{ url_for('main.admin_panel') }}" class="btn btn-secondary mb-3">← Назад к списку пользователей</a>
 
-<h3>✅ Выполнено</h3>
-<ul>
-  {% for task in done_tasks %}
-    <li><strong>{{ task.title }}</strong><br>{{ task.content }}</li>
-  {% else %}
-    <li>Нет задач</li>
-  {% endfor %}
-</ul>
+<!-- Секция для задач в процессе -->
+<h3>📋 В процессе ({{ todo_tasks|length }})</h3>
+{% if todo_tasks %}
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th style="width: 25%;">Заголовок</th>
+            <th>Описание</th>
+            <th style="width: 20%;">Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for task in todo_tasks %}
+        <tr>
+            <td>{{ task.title }}</td>
+            <td>{{ task.content }}</td>
+            <td>
+                <!-- ИСПРАВЛЕННЫЙ url_for -->
+                <a href="{{ url_for('main.admin_edit_task', task_id=task.id) }}" class="btn btn-sm btn-primary">Редактировать</a>
+                <!-- ИСПРАВЛЕННЫЙ url_for -->
+                <form action="{{ url_for('main.admin_delete_task', task_id=task.id) }}" method="post" style="display:inline;" onsubmit="return confirm('Вы уверены, что хотите удалить эту задачу?');">
+                    <button class="btn btn-sm btn-danger">Удалить</button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Нет активных задач.</p>
+{% endif %}
 
-<a href="{{ url_for('main.admin_panel') }}">← Назад к списку пользователей</a>
+
+<!-- Секция для выполненных задач -->
+<h3 class="mt-4">✅ Выполнено ({{ done_tasks|length }})</h3>
+{% if done_tasks %}
+<table class="table table-hover table-striped">
+    <thead>
+        <tr>
+            <th style="width: 25%;">Заголовок</th>
+            <th>Описание</th>
+            <th style="width: 20%;">Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for task in done_tasks %}
+        <tr class="table-success">
+            <td><s>{{ task.title }}</s></td>
+            <td><s>{{ task.content }}</s></td>
+            <td>
+                <!-- ИСПРАВЛЕННЫЙ url_for -->
+                <a href="{{ url_for('main.admin_edit_task', task_id=task.id) }}" class="btn btn-sm btn-primary">Редактировать</a>
+                <!-- ИСПРАВЛЕННЫЙ url_for -->
+                <form action="{{ url_for('main.admin_delete_task', task_id=task.id) }}" method="post" style="display:inline;" onsubmit="return confirm('Вы уверены, что хотите удалить эту задачу?');">
+                    <button class="btn btn-sm btn-danger">Удалить</button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Нет выполненных задач.</p>
+{% endif %}
+
 {% endblock %}

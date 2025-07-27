@@ -197,3 +197,14 @@ body {
 .card-body form:last-child .btn {
     width: 100%;
 }
+
+.input-group .form-control {
+  border-right: none;
+}
+
+.input-group .btn {
+  border-left: none;
+  border-radius: 0 0.5rem 0.5rem 0;
+  padding: 0 0.75rem;
+  font-size: 0.9rem;
+}

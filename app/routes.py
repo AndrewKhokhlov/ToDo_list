@@ -16,12 +16,12 @@ from app.forms import RegisterForm, LoginForm, TaskForm
 
 main = Blueprint('main', __name__)
 
-#  Flask‑Login: загрузка пользователя
+#  Flask-Login: загрузка пользователя
 @login_manager.user_loader
 def load_user(user_id: str):
     return User.query.get(int(user_id))
 
-#  ⛩  Админ‑панель
+#  ⛩  Админ-панель
 @main.route('/admin')
 @login_required
 def admin_panel():
@@ -41,12 +41,13 @@ def user_tasks(user_id: int):
         abort(403)
 
     user = User.query.get_or_404(user_id)
+    # Сортируем задачи для удобства
     done_tasks = Task.query.filter_by(
         user_id=user_id, completed=True
-    ).all()
+    ).order_by(Task.id.desc()).all()
     todo_tasks = Task.query.filter_by(
         user_id=user_id, completed=False
-    ).all()
+    ).order_by(Task.id.desc()).all()
 
     return render_template(
         'user_tasks.html',
@@ -55,7 +56,7 @@ def user_tasks(user_id: int):
         todo_tasks=todo_tasks
     )
 
-# Временный роут для первого создания админа.
+'''# Временный роут для первого создания админа.
 @main.route('/create-admin')
 def create_admin():
     """Однократное создание суперпользователя."""
@@ -69,16 +70,21 @@ def create_admin():
     )
     db.session.add(admin)
     db.session.commit()
-    return 'Admin created!'
+    return 'Admin created!'''
 
 #  Публичные страницы
 @main.route('/')
 def home():
+    if current_user.is_authenticated:
+        dest = 'main.admin_panel' if current_user.is_admin else 'main.dashboard'
+        return redirect(url_for(dest))
     return redirect(url_for('main.login'))
 
 #  Регистрация / Логин / Логаут
 @main.route('/register', methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.home'))
     form = RegisterForm()
     if form.validate_on_submit():
         if User.query.filter_by(username=form.username.data).first():
@@ -99,18 +105,14 @@ def register():
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.home'))
     form = LoginForm()
-
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-
-            # Админ → /admin, обычный юзер → /dashboard
-            dest = 'main.admin_panel' if user.is_admin else 'main.dashboard'
-            return redirect(url_for(dest))
-
+            return redirect(url_for('main.home'))
         flash("Неверный логин или пароль")
 
     return render_template('login.html', form=form)
@@ -162,24 +164,25 @@ def add():
 def edit(id: int):
     task = Task.query.get_or_404(id)
     if task.user_id != current_user.id:
-        return redirect(url_for('main.dashboard'))
+        abort(403)
 
-    form = TaskForm(title=task.title, content=task.content)
+    form = TaskForm(obj=task) # Заполняем форму данными из задачи
     if form.validate_on_submit():
         task.title = form.title.data
         task.content = form.content.data
         db.session.commit()
         return redirect(url_for('main.dashboard'))
 
-    return render_template('edit.html', form=form)
+    return render_template('edit.html', form=form, task=task)
 
 @main.route('/delete/<int:id>')
 @login_required
 def delete(id: int):
     task = Task.query.get_or_404(id)
-    if task.user_id == current_user.id:
-        db.session.delete(task)
-        db.session.commit()
+    if task.user_id != current_user.id:
+        abort(403)
+    db.session.delete(task)
+    db.session.commit()
     return redirect(url_for('main.dashboard'))
 
 @main.route('/toggle/<int:id>', methods=['POST'])
@@ -192,8 +195,67 @@ def toggle_status(id: int):
     task.completed = not task.completed
     db.session.commit()
 
-    status = request.args.get('status')
-    return redirect(
-        url_for('main.dashboard', status=status)
-        if status else url_for('main.dashboard')
-    )
+    # Возвращаемся на ту же страницу, с которой пришли
+    return redirect(request.referrer or url_for('main.dashboard'))
+
+# --- ИСПРАВЛЕННЫЕ И ДОПОЛНЕННЫЕ АДМИНСКИЕ МАРШРУТЫ ---
+
+@main.route('/admin/edit_task/<int:task_id>', methods=['GET', 'POST'])
+@login_required
+def admin_edit_task(task_id):
+    """Редактирование задачи от имени администратора."""
+    if not current_user.is_admin:
+        abort(403)
+
+    task = Task.query.get_or_404(task_id)
+    # При GET запросе, форма заполняется данными из task
+    # `obj=task` работает, если имена полей в форме совпадают с именами в модели
+    form = TaskForm(obj=task)
+
+    if form.validate_on_submit():
+        # Обновляем задачу данными из формы
+        task.title = form.title.data
+        task.content = form.content.data
+        # Если в TaskForm есть поле 'completed', можно обновлять и его
+        if 'completed' in form:
+            task.completed = form.completed.data
+        db.session.commit()
+        flash("Задача обновлена", "success")
+        return redirect(url_for('main.user_tasks', user_id=task.user_id))
+
+    # Передаем form и task в шаблон edit.html
+    # Этот шаблон можно использовать повторно
+    return render_template('edit.html', form=form, task=task)
+
+@main.route('/admin/delete_task/<int:task_id>', methods=['POST'])
+@login_required
+def admin_delete_task(task_id):
+    """Удаление задачи от имени администратора."""
+    if not current_user.is_admin:
+        abort(403)
+
+    task = Task.query.get_or_404(task_id)
+    user_id = task.user_id # Сохраняем ID владельца для редиректа
+    db.session.delete(task)
+    db.session.commit()
+    flash("Задача удалена", "success")
+    return redirect(url_for('main.user_tasks', user_id=user_id))
+
+@main.route('/admin/delete_user/<int:user_id>', methods=['POST'])
+@login_required
+def delete_user(user_id):
+    """Удаление пользователя и ВСЕХ его задач."""
+    if not current_user.is_admin:
+        abort(403)
+
+    user = User.query.get_or_404(user_id)
+    if user.is_admin:
+        flash("Нельзя удалить другого администратора.", "danger")
+        return redirect(url_for('main.admin_panel'))
+    
+    # Благодаря 'cascade="all, delete-orphan"' в модели User,
+    # все задачи этого пользователя удалятся автоматически.
+    db.session.delete(user)
+    db.session.commit()
+    flash(f"Пользователь {user.username} и все его задачи были удалены.", "success")
+    return redirect(url_for('main.admin_panel'))

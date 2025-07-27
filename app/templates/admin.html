@@ -3,11 +3,31 @@
 {% block content %}
 <h2>👑 Панель администратора</h2>
 
-<ul>
-{% for user in users %}
-    <li>
-        <a href="{{ url_for('main.user_tasks', user_id=user.id) }}">{{ user.username }}</a>
-    </li>
-{% endfor %}
-</ul>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Имя пользователя</th>
+            <th>Email</th>
+            <th>Действия</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for user in users %}
+        <tr>
+            <td>
+               <a href="{{ url_for('main.user_tasks', user_id=user.id) }}">{{ user.username }}</a>
+
+            </td>
+            <td>{{ user.email }}</td>
+            <td>
+                <form action="{{ url_for('main.delete_user', user_id=user.id) }}" method="post" style="display:inline;">
+                    <button class="btn btn-danger btn-sm" onclick="return confirm('Удалить пользователя {{ user.username }}?')">
+                        Удалить
+                    </button>
+                </form>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endblock %}

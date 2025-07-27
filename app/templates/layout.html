@@ -49,5 +49,32 @@
     integrity="sha384-gJWVzF1Aw7vlHeeFv0MDLkLHQy4JhGFe9VqGo5ZQaQqNGe9eq3U3ih6FKPvEpmJ3"
     crossorigin="anonymous"
   ></script>
+
+<script>
+  // Для формы регистрации
+  const togglePassword = document.getElementById("togglePassword");
+  const passwordInput = document.getElementById("passwordInput");
+  const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
+  const confirmPasswordInput = document.getElementById("confirmPasswordInput");
+
+  if (togglePassword && passwordInput) {
+    togglePassword.addEventListener("click", () => {
+      const isHidden = passwordInput.type === "password";
+      passwordInput.type = isHidden ? "text" : "password";
+      togglePassword.innerHTML = isHidden ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+    });
+  }
+
+  if (toggleConfirmPassword && confirmPasswordInput) {
+    toggleConfirmPassword.addEventListener("click", () => {
+      const isHidden = confirmPasswordInput.type === "password";
+      confirmPasswordInput.type = isHidden ? "text" : "password";
+      toggleConfirmPassword.innerHTML = isHidden ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+    });
+  }
+</script>
+
+
+
 </body>
 </html>

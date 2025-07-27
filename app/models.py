@@ -5,7 +5,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
-    tasks = db.relationship('Task', backref='user', lazy=True)
+    tasks = db.relationship('Task', backref='owner', lazy=True, cascade="all, delete-orphan")
     is_admin = db.Column(db.Boolean, default=False)
 
 class Task(db.Model):

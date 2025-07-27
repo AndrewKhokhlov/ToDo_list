@@ -17,8 +17,14 @@
 
         <div class="mb-3">
           {{ form.password.label(class="form-label fw-semibold") }}
-          {{ form.password(class="form-control form-control-lg", placeholder="Пароль") }}
+          <div class="input-group">
+            {{ form.password(class="form-control form-control-lg", placeholder="Пароль", id="passwordInput") }}
+            <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+              <i class="fas fa-eye"></i>
+            </button>
+          </div>
         </div>
+
 
         <div class="d-grid">
           {{ form.submit(class="btn btn-lg btn-accent") }}
