@@ -17,12 +17,12 @@ from app.forms import RegisterForm, LoginForm, EditProfileForm, ChangePasswordFo
 
 main = Blueprint('main', __name__)
 
-#  Flask-Login: загрузка пользователя
+# Flask-Login: загрузка пользователя
 @login_manager.user_loader
 def load_user(user_id: str):
     return User.query.get(int(user_id))
 
-#  ⛩  Админ-панель
+# Админ-панель
 @main.route('/admin')
 @login_required
 def admin_panel():
@@ -90,9 +90,6 @@ def register():
     
     form = RegisterForm()
     if form.validate_on_submit():
-        # Валидаторы form.validate_username и form.validate_email уже проверили уникальность
-        # Если бы они не прошли, form.validate_on_submit() был бы False,
-        # и этот блок не был бы выполнен.
 
         new_user = User(
             username=form.username.data,
@@ -104,26 +101,23 @@ def register():
         flash("Регистрация успешна!", 'success') # Добавил категорию 'success'
         return redirect(url_for('main.login'))
 
-    # Если это GET-запрос ИЛИ валидация не прошла, рендерим форму.
-    # Ошибки валидации будут автоматически привязаны к полям формы (form.username.errors, form.email.errors и т.д.)
     return render_template('register.html', form=form)
 
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('main.home')) # Или 'main.dashboard'
+        return redirect(url_for('main.home'))
     
     form = LoginForm()
     if form.validate_on_submit():
-        # ИЗМЕНЕНО: Ищем пользователя по email, а не по username
         user = User.query.filter_by(email=form.email.data).first()
         
         # Проверяем, найден ли пользователь и совпадает ли пароль
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-            flash("Вы успешно вошли в систему!", 'success') # Опциональное флэш-сообщение
-            return redirect(url_for('main.home')) # Или 'main.dashboard'
+            flash("Вы успешно вошли в систему!", 'success')
+            return redirect(url_for('main.home'))
         
         # Если пользователь не найден или пароль не совпал
         flash("Неверный Email или пароль", 'danger')
@@ -141,7 +135,7 @@ def logout():
 @main.route('/dashboard')
 @login_required
 def dashboard():
-    status = request.args.get('status')  # "completed", "active", None
+    status = request.args.get('status')  # "completed", "active"
     query = Task.query.filter_by(user_id=current_user.id)
 
     if status == 'completed':
@@ -211,8 +205,6 @@ def toggle_status(id: int):
     # Возвращаемся на ту же страницу, с которой пришли
     return redirect(request.referrer or url_for('main.dashboard'))
 
-# --- ИСПРАВЛЕННЫЕ И ДОПОЛНЕННЫЕ АДМИНСКИЕ МАРШРУТЫ ---
-
 @main.route('/admin/edit_task/<int:task_id>', methods=['GET', 'POST'])
 @login_required
 def admin_edit_task(task_id):
@@ -221,8 +213,7 @@ def admin_edit_task(task_id):
         abort(403)
 
     task = Task.query.get_or_404(task_id)
-    # При GET запросе, форма заполняется данными из task
-    # `obj=task` работает, если имена полей в форме совпадают с именами в модели
+
     form = TaskForm(obj=task)
 
     if form.validate_on_submit():
@@ -235,9 +226,7 @@ def admin_edit_task(task_id):
         db.session.commit()
         flash("Задача обновлена", "success")
         return redirect(url_for('main.user_tasks', user_id=task.user_id))
-
-    # Передаем form и task в шаблон edit.html
-    # Этот шаблон можно использовать повторно
+    
     return render_template('edit.html', form=form, task=task)
 
 @main.route('/admin/delete_task/<int:task_id>', methods=['POST'])
@@ -248,7 +237,7 @@ def admin_delete_task(task_id):
         abort(403)
 
     task = Task.query.get_or_404(task_id)
-    user_id = task.user_id # Сохраняем ID владельца для редиректа
+    user_id = task.user_id
     db.session.delete(task)
     db.session.commit()
     flash("Задача удалена", "success")
@@ -266,8 +255,6 @@ def delete_user(user_id):
         flash("Нельзя удалить другого администратора.", "danger")
         return redirect(url_for('main.admin_panel'))
     
-    # Благодаря 'cascade="all, delete-orphan"' в модели User,
-    # все задачи этого пользователя удалятся автоматически.
     db.session.delete(user)
     db.session.commit()
     flash(f"Пользователь {user.username} и все его задачи были удалены.", "success")

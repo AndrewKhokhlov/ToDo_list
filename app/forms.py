@@ -44,14 +44,14 @@ class EditProfileForm(FlaskForm):
         self.original_email = original_email
 
     def validate_username(self, username):
-        # Проверяем, изменилось ли имя пользователя и существует ли оно уже
+        # Проверка, изменилось ли имя пользователя и существует ли оно уже
         if username.data != self.original_username:
             user = User.query.filter_by(username=self.username.data).first()
             if user:
                 raise ValidationError('Это имя пользователя уже занято.')
 
     def validate_email(self, email):
-        # Проверяем, изменился ли email и существует ли он уже
+        # Проверка, изменился ли email и существует ли он уже
         if email.data != self.original_email:
             user = User.query.filter_by(email=self.email.data).first()
             if user:
