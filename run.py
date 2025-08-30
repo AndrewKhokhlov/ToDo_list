@@ -1,17 +1,9 @@
 import sys
 import os
 
-'''print("--- sys.path ---")
-for p in sys.path:
-    print(p)
-print("--- Current Working Directory ---")
-print(os.getcwd())
-print("----------------")'''
-
 from app import create_app, db
 from app.models import User
 from werkzeug.security import generate_password_hash
-#from flask_mail import Mail
 
 app = create_app()
 

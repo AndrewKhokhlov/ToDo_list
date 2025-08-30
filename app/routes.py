@@ -98,7 +98,7 @@ def register():
         )
         db.session.add(new_user)
         db.session.commit()
-        flash("Регистрация успешна!", 'success') # Добавил категорию 'success'
+        flash("Регистрация успешна!", 'success')
         return redirect(url_for('main.login'))
 
     return render_template('register.html', form=form)
@@ -135,7 +135,7 @@ def logout():
 @main.route('/dashboard')
 @login_required
 def dashboard():
-    status = request.args.get('status')  # "completed", "active"
+    status = request.args.get('status')
     query = Task.query.filter_by(user_id=current_user.id)
 
     if status == 'completed':
